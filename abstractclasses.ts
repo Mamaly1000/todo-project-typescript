@@ -23,14 +23,14 @@ type ToDoTypesDTO = {
   title: string;
   state: State;
 };
-
+type result = ToDoTypes | MessageType;
 interface IToDoRepFunctions {
   message: MessageType;
   CreateToDo(obj: ToDoTypesDTO): MessageType;
   DeleteToDo(id: number): MessageType;
   UpdateToDo(id: number, data: ToDoTypesDTO): MessageType;
   GetList(): ToDoTypes[];
-  GetById(id: number): MessageType | ToDoTypes;
+  GetById(id: number): result;
 }
 
 abstract class ToDoRep implements IToDoRepFunctions {
@@ -52,7 +52,7 @@ abstract class ToDoRep implements IToDoRepFunctions {
   public GetList(): ToDoTypes[] {
     return this.ToDos;
   }
-  public GetById(id: number): MessageType | ToDoTypes {
+  public GetById(id: number): result {
     return { message: "you get a todo by an id" };
   }
 }
@@ -100,6 +100,14 @@ class ToDoController extends ToDoRep {
     }
     return this.message;
   }
+  public GetById(id: number): result {
+    let checking = this.ToDos.find((todo) => todo.id === id);
+    if (checking) {
+      return checking;
+    } else {
+      return (this.message = { message: "there is no todo with this id!" });
+    }
+  }
 }
 let todo = new ToDoController();
 
@@ -126,5 +134,6 @@ todo.UpdateToDo(2, {
   state: State.UPDATED,
   title: "i updated this todo!",
 });
-
+console.log(todo.GetById(5));
+console.log(todo.GetById(3));
 console.log(todo.GetList());
